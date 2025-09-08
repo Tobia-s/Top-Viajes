@@ -1,10 +1,3 @@
-
-"""
-Módulo del equipo GRUPO 02 - Sistema de Viajes (Etapa 1 con Excepciones)
-- Estructuras: listas, listas de listas (matrices), cadenas, funciones
-- Ahora incorpora: manejo de excepciones (try/except, raise) según Clase 06
-- No usa archivos, ni POO, ni diccionarios/tuplas/conjuntos
-"""
 import random
 
 # ------------------------- Excepciones propias -------------------------
@@ -20,10 +13,23 @@ class DestinationError(Exception):
 class EmptyItineraryError(Exception):
     pass
 
-# ------------------------- Datos simulados base -------------------------
+#  Utilidades simples 
+normalizar = lambda s: s.strip()
+
+def input_int(prompt):
+    """Lee un entero por teclado con validación y manejo de ValueError."""
+    while True:
+        try:
+            s = input(prompt).strip()
+            return int(s)
+        except ValueError:
+            print(" Error, debe ingresar un número entero. Intente nuevamente.")
+
+#  Datos simulados base 
 DESTINOS = ["CABA", "La Plata", "Mar del Plata", "Rosario", "Córdoba", "Mendoza", "Salta", "Bariloche"]
 PROVINCIAS = ["CABA", "Buenos Aires", "Buenos Aires", "Santa Fe", "Córdoba", "Mendoza", "Salta", "Río Negro"]
 
+# Matriz de distancias (km) 
 _KM = [
     [0,   56,  415, 300, 700, 1050, 1540, 1620],
     [56,   0,  355, 330, 690, 1100, 1590, 1700],
@@ -35,10 +41,12 @@ _KM = [
     [1620,1700,1600,1500,1450, 800, 2100,   0],
 ]
 
-# ------------------------- Utilidades -------------------------
+#  Utilidades de negocio 
 def idx_destino(nombre):
+    """Devuelve el índice del destino en DESTINOS, o -1 si no existe."""
     i = 0
-    while i < len(DESTINOS) and DESTINOS[i].lower() != nombre.lower():
+    nombre = nombre.lower()
+    while i < len(DESTINOS) and DESTINOS[i].lower() != nombre:
         i += 1
     return i if i < len(DESTINOS) else -1
 
@@ -54,16 +62,7 @@ def provincia_de(destino):
         raise DestinationError("Destino desconocido para obtener provincia.")
     return PROVINCIAS[i]
 
-def input_int(prompt):
-    """Lee un entero por teclado con validación y manejo de ValueError."""
-    while True:
-        try:
-            s = input(prompt).strip()
-            return int(s)
-        except ValueError:
-            print("❌ Debe ingresar un número entero. Intente nuevamente.")
-
-# ------------------------- Autenticación -------------------------
+#  Autenticación 
 def crear_usuarios_simulados(n):
     usuarios = ["admin"] + [f"user{i+1}" for i in range(n)]
     contras = ["admin"] + ["1234" for _ in range(n)]
@@ -78,18 +77,19 @@ def autenticar(usuarios, contras, user, pwd):
         i += 1
     raise AuthError("Credenciales inválidas.")
 
-# ------------------------- Registro y consulta de viajes (usuario) -------------------------
+#  Usuario: registro y consultas 
 def registrar_viaje(viajes, pos_usuario):
     print("Ingrese ORIGEN (o 'fin' para cancelar):")
-    origen = input("> ").strip()
+    origen = normalizar(input("> "))
     if origen.lower() == "fin":
         return
     if idx_destino(origen) == -1:
         raise DestinationError("Origen no válido. Debe ser uno de los destinos conocidos.")
+
     trayecto = [origen]
     print("Ingrese destinos uno por uno. Escriba 'fin' para terminar.")
     while True:
-        dest = input("Destino: ").strip()
+        dest = normalizar(input("Destino: "))
         if dest.lower() == "fin":
             break
         if dest == "":
@@ -156,7 +156,36 @@ def eliminar_viaje(viajes, pos_usuario):
     viajes[pos_usuario] = []
     print("Viaje eliminado.")
 
-# ------------------------- Estadísticas (admin) -------------------------
+def reporte_consolidado(viajes, usuarios):
+    max_paradas = 0
+    i = 0
+    while i < len(viajes):
+        if len(viajes[i]) > max_paradas:
+            max_paradas = len(viajes[i])
+        i += 1
+
+    print("\n=== REPORTE CONSOLIDADO DE VIAJES (MATRIZ) ===")
+    encabezado = ["Usuario"]
+    j = 0
+    while j < max_paradas:
+        encabezado.append("Origen" if j == 0 else f"Destino {j}")
+        j += 1
+    print(" | ".join(encabezado))
+
+    i = 0
+    while i < len(usuarios):
+        fila = [usuarios[i]]
+        j = 0
+        while j < max_paradas:
+            if j < len(viajes[i]):
+                fila.append(viajes[i][j])
+            else:
+                fila.append("-")
+            j += 1
+        print(" | ".join(fila))
+        i += 1
+
+#  Estadísticas 
 def cantidad_usuarios(usuarios):
     return len(usuarios)
 
@@ -169,6 +198,7 @@ def total_km_todos(viajes):
             try:
                 total += km_entre(viajes[i][j], viajes[i][j+1])
             except DestinationError:
+                # Si hay datos inválidos en algún viaje simulado, se ignora 
                 pass
             j += 1
         i += 1
@@ -178,7 +208,7 @@ def top5_destinos(viajes):
     visitas = [0] * len(DESTINOS)
     i = 0
     while i < len(viajes):
-        j = 1
+        j = 1  
         while j < len(viajes[i]):
             idx = idx_destino(viajes[i][j])
             if idx != -1:
@@ -194,10 +224,9 @@ def top5_destinos(viajes):
             if visitas[indices[b]] > visitas[indices[pos_max]]:
                 pos_max = b
             b += 1
-        aux = indices[a]
-        indices[a] = indices[pos_max]
-        indices[pos_max] = aux
+        indices[a], indices[pos_max] = indices[pos_max], indices[a]
         a += 1
+    # top 5 con visitas > 0
     resultado = []
     k = 0
     while k < 5 and k < len(indices):
@@ -239,18 +268,18 @@ def usuario_max_destinos(usuarios, viajes):
 
 def cambiar_contrasena(usuarios, contrasenas):
     print("Usuario a modificar:")
-    u = input("> ").strip()
+    u = normalizar(input("> "))
     i = 0
     while i < len(usuarios) and usuarios[i] != u:
         i += 1
     if i < len(usuarios):
         print("Nueva contraseña:")
-        contrasenas[i] = input("> ").strip()
+        contrasenas[i] = normalizar(input("> "))
         print("Contraseña cambiada.")
     else:
         raise AuthError("Usuario no encontrado.")
 
-# ------------------------- Simulador de datos -------------------------
+#  Simulador de datos 
 def simular_viajes(viajes, prob_tener_viaje=0.8):
     i = 0
     while i < len(viajes):
@@ -268,7 +297,7 @@ def simular_viajes(viajes, prob_tener_viaje=0.8):
         i += 1
     return viajes
 
-# ------------------------- Menús -------------------------
+#  Menús 
 def menu_usuario(nombre, usuarios, contras, viajes, pos_usuario):
     opcion = -1
     while opcion != 7:
@@ -286,14 +315,14 @@ def menu_usuario(nombre, usuarios, contras, viajes, pos_usuario):
                 try:
                     registrar_viaje(viajes, pos_usuario)
                 except DestinationError as e:
-                    print("❌", e)
+                    print("Error", e)
             elif opcion == 2:
                 consultar_viaje(viajes, pos_usuario)
             elif opcion == 3:
                 try:
                     kms_viaje(viajes, pos_usuario)
                 except (EmptyItineraryError, DestinationError) as e:
-                    print("❌", e)
+                    print("Error", e)
             elif opcion == 4:
                 cant_escalas(viajes, pos_usuario)
             elif opcion == 5:
@@ -305,11 +334,11 @@ def menu_usuario(nombre, usuarios, contras, viajes, pos_usuario):
             else:
                 raise MenuOptionError("Opción inválida.")
         except MenuOptionError as e:
-            print("❌", e)
+            print("Error", e)
 
 def menu_admin(usuarios, contras, viajes):
     opcion = -1
-    while opcion != 8:
+    while opcion != 9:
         print("\n--- Menú Admin ---")
         print("1) Cantidad de usuarios")
         print("2) KM totales (todos los usuarios)")
@@ -318,7 +347,8 @@ def menu_admin(usuarios, contras, viajes):
         print("5) Usuario con más destinos")
         print("6) Menú de usuario (impersonar)")
         print("7) Cambiar contraseña de usuario")
-        print("8) Cerrar sesión")
+        print("8) Reporte consolidado (matriz de viajes)")
+        print("9) Cerrar sesión")
         try:
             opcion = input_int("Opción: ")
             if opcion == 1:
@@ -343,22 +373,24 @@ def menu_admin(usuarios, contras, viajes):
                 print("Usuario con más destinos:", u, "-", cant, "destinos")
             elif opcion == 6:
                 print("Usuario a simular menú:")
-                u = input("> ").strip()
+                u = normalizar(input("> "))
                 i = 0
                 while i < len(usuarios) and usuarios[i] != u:
                     i += 1
                 if i < len(usuarios):
                     menu_usuario(usuarios[i], usuarios, contras, viajes, i)
                 else:
-                    print("❌ Usuario no encontrado.")
+                    print("Error, usuario no encontrado.")
             elif opcion == 7:
                 try:
                     cambiar_contrasena(usuarios, contras)
                 except AuthError as e:
-                    print("❌", e)
+                    print("Error", e)
             elif opcion == 8:
+                reporte_consolidado(viajes, usuarios)
+            elif opcion == 9:
                 print("Cerrando sesión...")
             else:
                 raise MenuOptionError("Opción inválida.")
         except MenuOptionError as e:
-            print("❌", e)
+            print("Error", e)
