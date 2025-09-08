@@ -39,5 +39,32 @@ Triply
 
 ##  Simulación de datos
 - Se crean automáticamente 5 usuarios comunes más el administrador.  
-- Los viajes se **simulan aleatoriamente** usando `random` para que los reportes muestren información sin necesidad de cargar manualmente.  
+- Los viajes se **simulan aleatoriamente** usando `random` para que los reportes muestren información sin necesidad de cargar manualmente.
+
+### Destinos válidos
+El sistema trabaja con un conjunto fijo de destinos, definidos en la lista `DESTINOS`:
+
+- CABA  
+- La Plata  
+- Mar del Plata  
+- Rosario  
+- Córdoba  
+- Mendoza  
+- Salta  
+- Bariloche  
+
+Solo se aceptan estos destinos como **origen** o **destino**.  
+Si se ingresa un valor diferente (ejemplo: `Paris`), el sistema mostrará un error `Destino no válido`.
+
+### Pasos para registrar un viaje
+1. Ingresar como usuario común (`user1` … `user5`, contraseña `1234`).  
+2. Elegir la opción **1) Registrar viaje** en el menú.  
+3. Ingresar un **origen** válido de la lista anterior.  
+   - Para cancelar, escribir `fin`.  
+4. Ingresar los **destinos** uno por uno.  
+   - Finalizar escribiendo `fin`.  
+   - Si se ingresa dos veces seguidas el mismo destino, se ignora el duplicado.  
+5. El viaje queda registrado y puede consultarse en las demás opciones del menú.
+
+---
 
