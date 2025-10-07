@@ -1,0 +1,66 @@
+{
+  "admin": {
+    "password": "admin",
+    "viaje": [
+      [
+        "CABA",
+        "La Plata"
+      ],
+      [
+        "La Plata",
+        "Rosario"
+      ]
+    ]
+  },
+  "user1": {
+    "password": "1234",
+    "viaje": [
+      [
+        "Salta",
+        "CABA"
+      ]
+    ]
+  },
+  "user2": {
+    "password": "1234",
+    "viaje": [
+      [
+        "Mendoza",
+        "Rosario"
+      ],
+      [
+        "Rosario",
+        "Mar del Plata"
+      ],
+      [
+        "Mar del Plata",
+        "CABA"
+      ],
+      [
+        "CABA",
+        "Salta"
+      ]
+    ]
+  },
+  "user3": {
+    "password": "1234",
+    "viaje": []
+  },
+  "user4": {
+    "password": "1234",
+    "viaje": []
+  },
+  "user5": {
+    "password": "1234",
+    "viaje": [
+      [
+        "Mendoza",
+        "Bariloche"
+      ],
+      [
+        "Bariloche",
+        "Cordoba"
+      ]
+    ]
+  }
+}

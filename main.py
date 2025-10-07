@@ -1,26 +1,45 @@
+"""
+main.py - Voyago (diccionarios, tuplas, sets y archivos JSON)
+"""
 from modulo_grupo02 import (
-    crear_usuarios_simulados, simular_viajes,
-    menu_usuario, menu_admin, autenticar, AuthError
+    cargar_datos, guardar_datos, crear_viajeros_simulados, simular_viajes,
+    autenticar, menu_usuario, menu_admin, AuthError
 )
 
-usuarios, contras, viajes = crear_usuarios_simulados(5)
-viajes = simular_viajes(viajes, prob_tener_viaje=0.8)
+# ------------------------- Cargar o inicializar datos -------------------------
+try:
+    logs = open("logs.txt", "w")
+except OSError:
+    print("Error de archivo de log, logs deshabilitados")
+else:
 
-#  Inicio de sesión 
-while True:
-    print("\nIngrese su usuario (o 'salir' para terminar):")
-    u = input("> ").strip()
-    if u.lower() == "salir":
-        print("¡Hasta luego!")
-        break
-    print("Ingrese contraseña:")
-    p = input("> ").strip()
+    viajeros = cargar_datos()
+    if viajeros is None:
+        # No hay archivo: creamos y simulamos
+        viajeros = crear_viajeros_simulados(5)
+        viajeros = simular_viajes(viajeros, prob_tener_viaje=0.8)
+        guardar_datos(viajeros)
 
-    try:
-        pos = autenticar(usuarios, contras, u, p)
-        if usuarios[pos] == "admin":
-            menu_admin(usuarios, contras, viajes)
-        else:
-            menu_usuario(usuarios[pos], usuarios, contras, viajes, pos)
-    except AuthError as e:
-        print("Error", e)
+    # ------------------------- Inicio de sesion -------------------------
+    while True:
+        print("\nIngrese su usuario (o 'salir' para terminar):")
+        u = input("> ").strip()
+        if u.lower() == "salir":
+            print("¡Hasta luego!")
+            break
+        print("Ingrese contraseña:")
+        p = input("> ").strip()
+
+        try:
+            user = autenticar(viajeros, u, p)
+            if user == "admin":
+                logs.write("Usuario admin logueado")
+                menu_admin(viajeros, logs)
+            else:
+                logs.write("Usuario logueado")
+                logs.write(user)
+                menu_usuario(viajeros, user, logs)
+        except AuthError as e:
+            print(e)
+finally:
+    logs.close
