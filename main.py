@@ -10,7 +10,7 @@ from modulo_grupo02 import (
 try:
     logs = open("logs.txt", "w")
 except OSError:
-    print("Error de archivo de log, logs deshabilitados")
+    print("Error de archivo de log, cerrando")
 else:
 
     viajeros = cargar_datos()
@@ -29,6 +29,9 @@ else:
             break
         print("Ingrese contraseña:")
         p = input("> ").strip()
+
+
+
 
         try:
             user = autenticar(viajeros, u, p)

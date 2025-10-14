@@ -60,6 +60,11 @@ def provincia_de(destino):
         raise DestinationError("Destino desconocido para obtener provincia.")
     return PROVINCIAS[i]
 
+
+
+
+
+
 # ------------------------- Persistencia (JSON) -------------------------
 def _encode_for_json(viajeros):
     """Convierte tramos tuple->list para que sean serializables en JSON."""
@@ -69,6 +74,8 @@ def _encode_for_json(viajeros):
         salida[u] = {"password": data.get("password", ""), "viaje": tramos}
     return salida
 
+
+
 def _decode_from_json(data):
     """Convierte tramos list->tuple al cargar JSON."""
     viajeros = {}
@@ -77,9 +84,16 @@ def _decode_from_json(data):
         viajeros[u] = {"password": d.get("password", ""), "viaje": tramos}
     return viajeros
 
+
+
+
 def guardar_datos(viajeros, archivo=DATA_FILE):
     with open(archivo, "w", encoding="utf-8") as f:
         json.dump(_encode_for_json(viajeros), f, ensure_ascii=False, indent=2)
+
+
+
+
 
 def cargar_datos(archivo=DATA_FILE):
     if not os.path.exists(archivo):
@@ -89,6 +103,9 @@ def cargar_datos(archivo=DATA_FILE):
     return _decode_from_json(data)
 
 
+
+
+
 def crear_viajeros_simulados(n):
     viajeros = {"admin": {"password": "admin", "viaje": []}}
     i = 1
@@ -96,6 +113,10 @@ def crear_viajeros_simulados(n):
         viajeros[f"user{i}"] = {"password": "1234", "viaje": []}
         i += 1
     return viajeros
+
+
+
+
 
 def simular_viajes(viajeros, prob_tener_viaje=0.8):
     for u in viajeros.keys():
@@ -118,12 +139,22 @@ def simular_viajes(viajeros, prob_tener_viaje=0.8):
             viajeros[u]["viaje"] = tramos
     return viajeros
 
+
+
+
+
 # ------------------------- Autenticación (diccionario) -------------------------
 def autenticar(viajeros, user, pwd):
     data = viajeros.get(user)
     if not data or data["password"] != pwd:
         raise AuthError("Credenciales invalidas.")
     return user  
+
+
+
+
+
+
 
 # ------------------------- Utilidades de viaje (con tuplas de tramos) -------------------------
 def reconstruir_paradas(tramos):
@@ -136,6 +167,12 @@ def reconstruir_paradas(tramos):
         paradas.append(tramos[i][1])
         i += 1
     return paradas
+
+
+
+
+
+
 
 def registrar_viaje(viajeros, user):
     print("Ingrese ORIGEN (o 'fin' para cancelar):")
@@ -168,6 +205,11 @@ def registrar_viaje(viajeros, user):
         tramos.append((paradas[i], paradas[i+1]))
         i += 1
     viajeros[user]["viaje"] = tramos
+
+
+
+
+
 
 def consultar_viaje(viajeros, user):
     tramos = viajeros[user]["viaje"]
@@ -372,6 +414,12 @@ def menu_usuario(viajeros, user, logs):
                 raise MenuOptionError("Opcion invalida.")
         except MenuOptionError as e:
             print(e)
+
+
+
+
+
+
 
 def menu_admin(viajeros, logs):
     opcion = -1
