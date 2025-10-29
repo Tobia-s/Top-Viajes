@@ -370,7 +370,7 @@ def reporte_consolidado(viajeros):
         print(" | ".join(fila))
 
 # ------------------------- Menus -------------------------
-def menu_usuario(viajeros, user, logs):
+def menu_usuario(viajeros, user):
     opcion = -1
     while opcion != 7:
         print("\n--- Menu Usuario ---")
@@ -386,8 +386,6 @@ def menu_usuario(viajeros, user, logs):
             if opcion == 1:
                 try:
                     registrar_viaje(viajeros, user)
-                    logs.write("un viaje se ha registrado por")
-                    logs.write(user)
                     guardar_datos(viajeros)
                 except DestinationError as e:
                     print(e)
@@ -421,7 +419,7 @@ def menu_usuario(viajeros, user, logs):
 
 
 
-def menu_admin(viajeros, logs):
+def menu_admin(viajeros):
     opcion = -1
     while opcion != 9:
         print("\n--- Menu Admin ---")
@@ -472,7 +470,6 @@ def menu_admin(viajeros, logs):
             elif opcion == 8:
                 reporte_consolidado(viajeros)
             elif opcion == 9:
-                logs.write("admin saliendo")
                 print("Cerrando sesion...")
             else:
                 raise MenuOptionError("Opcion invalida.")
