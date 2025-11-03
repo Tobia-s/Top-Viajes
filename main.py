@@ -2,37 +2,39 @@
 main.py - Voyago (diccionarios, tuplas, sets y archivos JSON)
 """
 from modulo_grupo02 import (
-    cargar_datos, guardar_datos, crear_viajeros_simulados, simular_viajes,
-    autenticar, menu_usuario, menu_admin, AuthError
+    crear_viajeros_simulados, simular_viajes,
+    autenticar, menu_usuario, menu_admin, AuthError, escribir_log, leer_datos, escribir_datos
 )
 
 # ------------------------- Cargar o inicializar datos -------------------------
-
-viajeros = cargar_datos()
-if viajeros is None:
+'''
+viajes_usuario = cargar_datos()
+if viajes_usuario is None:
     # No hay archivo: creamos y simulamos
-    viajeros = crear_viajeros_simulados(5)
-    viajeros = simular_viajes(viajeros, prob_tener_viaje=0.8)
-    guardar_datos(viajeros)
+    viajes_usuario = crear_viajeros_simulados(5)
+    viajes_usuario = simular_viajes(viajes_usuario, prob_tener_viaje=0.8)
+    guardar_datos(viajes_usuario)'''
 
 # ------------------------- Inicio de sesion -------------------------
 while True:
+
     print("\nIngrese su usuario (o 'salir' para terminar):")
-    u = input("> ").strip()
-    if u.lower() == "salir":
+    usuario = input("> ").strip()
+    if usuario.lower() == "salir":
         print("¡Hasta luego!")
         break
     print("Ingrese contraseña:")
-    p = input("> ").strip()
+    contrasena = input("> ").strip()
 
-
-
-
-    try:
-        user = autenticar(viajeros, u, p)
-        if user == "admin":
-            menu_admin(viajeros)
-        else:
-            menu_usuario(viajeros, user)
-    except AuthError as e:
-        print(e)
+print (autenticar(usuario, contrasena))
+'''
+    user = autenticar(usuario, str(contrasena))
+    print (user)
+    if user == 1:
+        viajes_usuario = leer_datos(usuario)
+        menu_usuario(viajes_usuario, usuario)
+    elif user == 2:
+        menu_admin(usuario)
+    else:
+        print("Usuario o contraseña incorrecta")
+'''
