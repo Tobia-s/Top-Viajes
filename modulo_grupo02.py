@@ -18,7 +18,8 @@ class EmptyItineraryError(Exception):
     pass
 
 # ------------------------- Utilidades simples -------------------------
-normalizar = lambda s: s.strip()  
+normalizar = lambda s: s.strip()
+
 def input_int(prompt):
     while True:
         try:
@@ -42,7 +43,7 @@ _KM = [
     [1620,1700,1600,1500,1450, 800, 2100,   0],
 ]
 
-def idx_destino(nombre):
+def get_id_destino(nombre):
     nombre = nombre.lower()
     i = 0
     while i < len(DESTINOS) and DESTINOS[i].lower() != nombre:
@@ -50,13 +51,13 @@ def idx_destino(nombre):
     return i if i < len(DESTINOS) else -1
 
 def km_entre(origen, destino):
-    i, j = idx_destino(origen), idx_destino(destino)
+    i, j = get_id_destino(origen), get_id_destino(destino)
     if i == -1 or j == -1:
         raise DestinationError("Destino desconocido para calcular KM.")
     return _KM[i][j]
 
 def provincia_de(destino):
-    i = idx_destino(destino)
+    i = get_id_destino(destino)
     if i == -1:
         raise DestinationError("Destino desconocido para obtener provincia.")
     return PROVINCIAS[i]
@@ -162,37 +163,18 @@ def reconstruir_paradas(tramos):
 
 
 
-def registrar_viaje(viajeros, user):
-    print("Ingrese ORIGEN (o 'fin' para cancelar):")
-    origen = normalizar(input("> "))
-    if origen.lower() == "fin":
-        return
-    if idx_destino(origen) == -1:
-        raise DestinationError("Origen no valido. Debe ser uno de los destinos conocidos.")
-
-    print("Ingrese destinos uno por uno. Escriba 'fin' para terminar.")
-    paradas = [origen]
+def registrar_viaje(viajes_usuario, usuario):
     while True:
-        dest = normalizar(input("Destino: "))
-        if dest.lower() == "fin":
+        print("Ingrese nuevo destino (o 'fin' para cancelar):")
+        nuevo_destino = normalizar(input("> "))
+        if nuevo_destino.lower() == "fin":
             break
-        if dest == "":
-            print("Destino vacio: intente nuevamente.")
-            continue
-        if idx_destino(dest) == -1:
-            raise DestinationError(f"Destino no valido: '{dest}'.")
-        if dest == paradas[-1]:
+        if get_id_destino(nuevo_destino) == -1:
+            raise DestinationError("Origen no valido. Debe ser uno de los destinos conocidos.")
+        elif nuevo_destino == viajes_usuario[-1]:
             print("Destino igual al anterior, no se agrega.")
-            continue
-        paradas.append(dest)
-
-    
-    tramos = []
-    i = 0
-    while i < len(paradas) - 1:
-        tramos.append((paradas[i], paradas[i+1]))
-        i += 1
-    viajeros[user]["viaje"] = tramos
+        else:
+            viajes_usuario.append(nuevo_destino)
 
 
 
@@ -271,7 +253,7 @@ def top5_destinos(viajeros):
         i = 0
         while i < len(data["viaje"]):
             _, dest = data["viaje"][i]
-            idx = idx_destino(dest)
+            idx = get_id_destino(dest)
             if idx != -1:
                 visitas[idx] += 1
             i += 1
@@ -358,7 +340,7 @@ def reporte_consolidado(viajeros):
         print(" | ".join(fila))
 
 # ------------------------- Menus -------------------------
-def menu_usuario(viajes, usuario):
+def menu_usuario(viajes_usuario, usuario):
     opcion = -1
     while opcion != 7:
         print("\n--- Menu Usuario ---")
@@ -373,36 +355,33 @@ def menu_usuario(viajes, usuario):
             opcion = input_int("Opcion: ")
             if opcion == 1:
                 try:
-                    registrar_viaje(viajes, usuario)
-                    escribir_datos(viajes)
+                    registrar_viaje(viajes_usuario, usuario)
+                    escribir_datos(viajes_usuario)
                 except DestinationError as mensaje_error:
                     print(mensaje_error)
             elif opcion == 2:
-                consultar_viaje(viajes, usuario)
+                consultar_viaje(viajes_usuario, usuario)
             elif opcion == 3:
                 try:
-                    kms_viaje(viajes, usuario)
+                    kms_viaje(viajes_usuario, usuario)
                 except (EmptyItineraryError, DestinationError) as e:
                     print(e)
             elif opcion == 4:
-                cant_escalas(viajes, usuario)
+                cant_escalas(viajes_usuario, usuario)
             elif opcion == 5:
                 try:
-                    cant_provincias(viajes, usuario)
+                    cant_provincias(viajes_usuario, usuario)
                 except DestinationError as mensaje_error:
                     print(mensaje_error)
             elif opcion == 6:
-                eliminar_viaje(viajes, usuario)
-                escribir_datos(viajes)
+                eliminar_viaje(viajes_usuario, usuario)
+                escribir_datos(viajes_usuario)
             elif opcion == 7:
                 print("Cerrando sesion...")
             else:
                 raise MenuOptionError("Opcion invalida.")
         except MenuOptionError as mensaje_error:
             print(mensaje_error)
-
-
-
 
 
 
