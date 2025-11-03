@@ -1,5 +1,5 @@
 """
-main.py - Voyago (diccionarios, tuplas, sets y archivos JSON)
+Aterrizar Main.py
 """
 from modulo_grupo02 import (
     crear_viajeros_simulados, simular_viajes,
@@ -29,6 +29,9 @@ while True:
     user = autenticar(usuario, str(contrasena))
     if user == 1:
         viajes_usuario = leer_datos(usuario)[1]
+        print (type(viajes_usuario))
+        print ("lista")
+        print(viajes_usuario)
         menu_usuario(viajes_usuario, usuario)
     elif user == 2:
         menu_admin(usuario)
