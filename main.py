@@ -28,7 +28,7 @@ while True:
 
     user = autenticar(usuario, str(contrasena))
     if user == 1:
-        viajes_usuario = leer_datos(usuario)
+        viajes_usuario = leer_datos(usuario)[1]
         menu_usuario(viajes_usuario, usuario)
     elif user == 2:
         menu_admin(usuario)
