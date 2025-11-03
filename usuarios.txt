@@ -1,0 +1,4 @@
+Daniel;1234;1
+Tomas;1234;2
+Facundo;4356;1
+Pepe;hola;1

@@ -1,0 +1,1 @@
+Daniel;['Salta', 'CABA', 'Mar del Plata', 'Rosario', 'CABA']
