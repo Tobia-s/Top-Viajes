@@ -127,23 +127,20 @@ def simular_viajes(viajeros, prob_tener_viaje=0.8):
 
 
 # ------------------------- Autenticación (diccionario) -------------------------
-def autenticar(usuario_ingresado, contrasena_ingresada, nombre_archivo_usuarios = USER_FILE):
-    ''' usuario;contrasena;tipo retorna tipo (tipo = 1 si es normal | tipo = 2 si es admin | -1 si no encuentra al usuario) '''
-    
-    with open(nombre_archivo_usuarios, mode="r", encoding="utf-8") as archivo_usuarios:
+def autenticar(usuario_ingresado, contrasena_ingresada):
+    '''usuario;contrasena;tipo (tipo = 1 si es normal | tipo = 2 si es admin | -1 si no encuentra al usuario)'''
+    with open("usuarios.txt", mode="r", encoding="utf-8") as archivo_usuarios:
         linea_leida = archivo_usuarios.readline()
-        tipo = 0
+        tipo_leido = 0
         while(linea_leida != ""):
             usuario_a_autenticar, contrasena_a_verificar, tipo = linea_leida.split(";")
-            print (usuario_a_autenticar, contrasena_a_verificar, tipo)
             if (usuario_ingresado == usuario_a_autenticar and contrasena_ingresada == contrasena_a_verificar):
-                print("Encontre usuario")
+                tipo_leido = int(tipo)
                 break
             linea_leida = archivo_usuarios.readline()
         else:
-            print("Usuario no encontrado")
-            tipo = -1
-        return tipo
+            tipo_leido = -1
+        return tipo_leido
 
 
 

@@ -26,10 +26,7 @@ while True:
     print("Ingrese contraseña:")
     contrasena = input("> ").strip()
 
-print (autenticar(usuario, contrasena))
-'''
     user = autenticar(usuario, str(contrasena))
-    print (user)
     if user == 1:
         viajes_usuario = leer_datos(usuario)
         menu_usuario(viajes_usuario, usuario)
@@ -37,4 +34,3 @@ print (autenticar(usuario, contrasena))
         menu_admin(usuario)
     else:
         print("Usuario o contraseña incorrecta")
-'''
