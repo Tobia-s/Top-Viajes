@@ -1,1 +1,3 @@
 Daniel;["Salta", "CABA", "Mar del Plata", "Rosario"]
+Tomas;["CABA", "Mar del Plata", "Cordoba"]
+Facundo;["Salta", "Santa Fe", "Buenos Aires"]
