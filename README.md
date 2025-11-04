@@ -5,7 +5,7 @@ Triply
  Integrantes: - Tobias Larramendi 1143238       
               - Galeano Coman Santiago 1207209
               - Bichutte Mateo 1174425
-              - Vazquez Daniel Andres
+              - Vazquez Daniel Andres 1220473
                 
 
 ## Usuarios Validos 
