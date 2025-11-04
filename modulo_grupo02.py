@@ -164,6 +164,7 @@ def reconstruir_paradas(tramos):
 
 
 def registrar_viaje(viajes_usuario, usuario):
+    print ("tipo ", type(viajes_usuario))
     while True:
         print("Ingrese nuevo destino (o 'fin' para cancelar):")
         nuevo_destino = normalizar(input("> "))
@@ -171,11 +172,15 @@ def registrar_viaje(viajes_usuario, usuario):
             break
         if get_id_destino(nuevo_destino) == -1:
             raise DestinationError("Origen no valido. Debe ser uno de los destinos conocidos.")
-        elif nuevo_destino == viajes_usuario[-1]:
-            print("Destino igual al anterior, no se agrega.")
         else:
-            viajes_usuario.append(nuevo_destino)
-
+            if len(viajes_usuario) == 0:
+                viajes_usuario.append(nuevo_destino)
+            else:
+                if nuevo_destino == viajes_usuario[-1]:
+                    print("Destino igual al anterior, no se agrega.")
+                else:
+                    viajes_usuario.append(nuevo_destino)
+        print (viajes_usuario)
 
 
 
@@ -356,7 +361,7 @@ def menu_usuario(viajes_usuario, usuario):
             if opcion == 1:
                 try:
                     registrar_viaje(viajes_usuario, usuario)
-                    escribir_datos(viajes_usuario)
+                    escribir_datos(usuario, viajes_usuario)
                 except DestinationError as mensaje_error:
                     print(mensaje_error)
             elif opcion == 2:
@@ -459,9 +464,11 @@ def usuario_existe(usuario_a_chequear): #hacer verificacion
 
 def leer_datos(usuario_a_leer, archivo=DATA_FILE):
     '''Busca al usuario y trae la info de viajes retorna -1 si hay un error, 0 si no lo encuentra o 1 si encuentra'''
+    datos_final = []
     resultado = 1
     try:
         with open(archivo, "r", encoding="utf-8") as archivo_viajes:
+            
             usuario_leido = ""
             datos_leidos = ""
             linea_leida = archivo_viajes.readline()
@@ -474,13 +481,14 @@ def leer_datos(usuario_a_leer, archivo=DATA_FILE):
                     linea_leida= ""
                 else:
                     if usuario_leido == usuario_a_leer:
-                        #try:
-                            print(datos_leidos)
-                            datos_leidos = json.loads(datos_leidos)
-                        #except ValueError:
-                            #print("Error de parseo lista")
-                            #resultado = -1
-                            #datos_leidos = ""
+                        try:
+                            print("datos recien agarrados", datos_leidos)
+                            datos_final = json.loads(datos_leidos)
+                            print("datos despues del JSON load", datos_final)
+                        except ValueError:
+                            ("Error de parseo lista")
+                            resultado = -1
+                            datos_leidos = ""
                             break
                 linea_leida = archivo_viajes.readline()
             else:
@@ -490,14 +498,18 @@ def leer_datos(usuario_a_leer, archivo=DATA_FILE):
         resultado = -1
         datos_leidos = ""
         print("Error de archivo")
-    return resultado, datos_leidos
+
+    print(datos_final)    
+    print(type(datos_final))
+    print("pos2", datos_final[2])
+    return resultado, datos_final
 
 
 
 def escribir_datos(usuario_a_escribir, datos_a_escribir, nombre_archivo_principal=DATA_FILE, nombre_archivo_temporal=TEMP_DATA_FILE):
     '''Escribe un archivo .txt temporal con los nuevos datos, si no encuentra al usuario lo agrega al final
     La estructura es usuario;[destino 1, destino2, destino3]   Retorna -1 si falla o 1 si escribe'''
-    
+
     resultado = 1
     usuario_encontrado = False
     try:
