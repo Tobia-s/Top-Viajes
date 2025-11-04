@@ -1,9 +1,8 @@
-Triply 
+Aterrizar 
 
-## Proyecot universitario utilizando Python 
+## Proyecto universitario utilizando Python 
 ## Objetivo: Simular un sistema de gestión de viajes que permita a los usuarios registrar y consultar itinerarios, y a los administradores obtener estadísticas globales.  
  Integrantes: - Tobias Larramendi 1143238       
-              - Galeano Coman Santiago 1207209
               - Bichutte Mateo 1174425
               - Vazquez Daniel Andres 1220473
                 
