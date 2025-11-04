@@ -484,6 +484,7 @@ def leer_datos(usuario_a_leer, archivo=DATA_FILE):
                         try:
                             print("datos recien agarrados", datos_leidos)
                             datos_final = json.loads(datos_leidos)
+                            print("datos despues del JSON load", datos_final)
                         except ValueError:
                             ("Error de parseo lista")
                             resultado = -1
