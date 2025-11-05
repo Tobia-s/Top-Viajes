@@ -1,0 +1,5 @@
+Usuario0;["Cordoba", "La Plata", "Mendoza", "Cordoba", "Mar del Plata", "Rosario", "Mar del Plata", "Bariloche"]
+Usuario1;["Rosario", "La Plata", "CABA", "Rosario", "Bariloche", "Rosario"]
+Usuario2;["CABA", "Bariloche", "Rosario", "Mar del Plata", "Cordoba", "Mar del Plata"]
+Usuario3;["CABA", "Rosario"]
+Usuario4;["Mendoza", "Salta", "Rosario", "Salta", "La Plata", "Cordoba", "Rosario"]

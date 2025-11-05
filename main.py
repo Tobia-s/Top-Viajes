@@ -6,7 +6,7 @@ from modulo_grupo02 import (crear_usuarios, autenticar, menu_usuario, menu_admin
 
 # ------------------------- Cargar o inicializar datos -------------------------
 
-crear_usuarios(5) #Formato Usuario: Usuario{i} contraseña: 1234
+#crear_usuarios(5) #Formato Usuario: Usuario{i} contraseña: 1234
 
 # ------------------------- Inicio de sesion -------------------------
 while True:
