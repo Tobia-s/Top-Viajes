@@ -44,215 +44,186 @@ _KM = [
     [1620,1700,1600,1500,1450, 800, 2100,   0],
 ]
 
-def get_id_destino(nombre):
+
+
+# ------------------------- Persistencia (JSON) -------------------------
+
+def crear_usuarios(cantidad, cant_viajes = 8, tipo = 1):
+    for i in range(cantidad):
+        crear_usuario_y_contrasena(f"Usuario{i}", "1234", tipo)
+        escribir_datos(f"Usuario{i}",simular_viajes())
+
+
+def crear_usuario_y_contrasena(usuario, contrasena, tipo=1):
+        if escribir_datos(usuario, contrasena, USER_FILE, TEMP_DATA_FILE, False, tipo) == -1:
+            print("Error al crear usuarios de prueba")
+
+
+def simular_viajes(cant_viajes_max = 8):
+    lista_viajes = []
+    cant_paradas = random.randint(2, cant_viajes_max)
+    lista_viajes.append(DESTINOS[random.randint(0, len(DESTINOS)-1)])
+    i=0
+    while i < cant_paradas - 1:
+        proximo_destino = DESTINOS[random.randint(0, len(DESTINOS)-1)]
+        if proximo_destino != lista_viajes[-1]:
+            lista_viajes.append(proximo_destino)
+            i += 1
+    return lista_viajes
+    
+
+
+
+# ------------Refactor line ------------------------------------------------------------------------------------------------------------------------------------
+
+# ------------------------- Reportes (admin) -------------------------
+def top5_destinos(): #Validado
+    usuario = ""
+    i=0
+    visitas = [0] * len(DESTINOS)
+    usuario = get_usuario_por_numero(i)
+    while usuario != "-1":          #itera usuarios
+        i += 1
+        usuario_viajes = leer_datos(usuario)[1]
+        for viaje in usuario_viajes:   #itera por cada destino del usuario
+            for indice_destinos in range(len(DESTINOS)):
+                if viaje == DESTINOS[indice_destinos]: #itera por cada destino en DESTINOS
+                    visitas[indice_destinos] += 1
+        usuario = get_usuario_por_numero(i)
+    #visitas tiene la cantidad de veces que se visitó el destino (el indice coincide con la lista DESTINOS)
+    lista_top5_destinos = []
+    for _ in range(5):
+        max = 0
+        for indice in range(len(visitas)): #itera por todos los destinos (visitas) y guarda el indice mas grande
+            if visitas[indice] > max:
+                max = visitas[indice]
+                indice_maximo = indice
+        lista_top5_destinos.append(DESTINOS[indice_maximo])
+        visitas[indice_maximo] = -1 #anulo el indice para que no se repita
+    return lista_top5_destinos
+
+
+def get_id_destino(nombre): #Validado
     nombre = nombre.lower()
     i = 0
     while i < len(DESTINOS) and DESTINOS[i].lower() != nombre:
         i += 1
     return i if i < len(DESTINOS) else -1
 
-def km_entre(origen, destino):
-    i, j = get_id_destino(origen), get_id_destino(destino)
-    if i == -1 or j == -1:
-        raise DestinationError("Destino desconocido para calcular KM.")
-    return _KM[i][j]
 
-def provincia_de(destino):
+def provincia_de(destino): #Validado
     i = get_id_destino(destino)
     if i == -1:
         raise DestinationError("Destino desconocido para obtener provincia.")
     return PROVINCIAS[i]
 
 
+def kms_viaje(viajes_usuario): #Validado
 
-
-
-
-# ------------------------- Persistencia (JSON) -------------------------
-
-
-
-
-def crear_viajeros_simulados(n):
-    viajeros = {"admin": {"password": "admin", "viaje": []}}
-    i = 1
-    while i <= n:
-        viajeros[f"user{i}"] = {"password": "1234", "viaje": []}
-        i += 1
-    return viajeros
-
-
-
-
-
-def simular_viajes(viajeros, prob_tener_viaje=0.8):
-    for u in viajeros.keys():
-        if random.random() < prob_tener_viaje:
-            total_paradas = random.randint(2, 5)
-            origen = DESTINOS[random.randint(0, len(DESTINOS)-1)]
-            paradas = [origen]
-            j = 1
-            while j < total_paradas:
-                d = DESTINOS[random.randint(0, len(DESTINOS)-1)]
-                if d != paradas[-1]:
-                    paradas.append(d)
-                    j += 1
-            # convertir paradas en tramos (tuplas)
-            tramos = []
-            k = 0
-            while k < len(paradas) - 1:
-                tramos.append((paradas[k], paradas[k+1]))
-                k += 1
-            viajeros[u]["viaje"] = tramos
-    return viajeros
-
-
-
-def kms_viaje(viajeros, user):
-    tramos = viajeros[user]["viaje"]
-    if len(tramos) == 0:
-        raise EmptyItineraryError("Aun no hay tramos suficientes para calcular KMs.")
+    cant_viajes = len(viajes_usuario)
+    if cant_viajes == 0:
+        print("No hay viaje cargado.")
+        return
     total = 0
     i = 0
-    while i < len(tramos):
-        a, b = tramos[i]
-        total += km_entre(a, b)
-        i += 1
-    print(f"KM del viaje: {total}")
+    if cant_viajes > 1:
+        while i < cant_viajes - 1:
+            total += km_entre(viajes_usuario[i], viajes_usuario[i+1])
+            i += 1
     return total
 
-def cant_escalas(viajeros, user):
-    tramos = viajeros[user]["viaje"]
-    print(f"Cantidad de escalas/destinos: {len(tramos)}")
-    return len(tramos)
 
-def cant_provincias(viajeros, user):
-    tramos = viajeros[user]["viaje"]
-    paradas = reconstruir_paradas(tramos)
-    if not paradas:
+def cant_escalas(usuario_viajes): #Validado
+    print(f"Cantidad de escalas/destinos: {len(usuario_viajes)-1}")
+    return len(usuario_viajes)-1
+
+
+def cant_provincias(usuario_viajes): #Validado
+ 
+    if usuario_viajes == []:
         print("No hay viaje cargado.")
         return 0
     provs = set()
     i = 1
-    while i < len(paradas):
-        provs.add(provincia_de(paradas[i]))
+    while i < len(usuario_viajes):
+        provs.add(provincia_de(usuario_viajes[i]))
         i += 1
     print("Provincias visitadas:", sorted(list(provs)))
     return len(provs)
 
-def eliminar_viaje(viajeros, user):
-    viajeros[user]["viaje"] = []
-    print("Viaje eliminado.")
 
-# ------------------------- Reportes (admin) -------------------------
+def total_km_todos(): #Verificado
+    indice_usuarios = 0
+    total_km = 0
+    usuario = get_usuario_por_numero(indice_usuarios)
+    while usuario != "-1":
+        indice_usuarios += 1
+        viajes_usuario = leer_datos(usuario)[1]
+        cant_destinos = len(viajes_usuario)
+        if cant_destinos > 1:
+            i=0
+            while i < cant_destinos - 1:
+                try:
+                    total_km += km_entre(viajes_usuario[i], viajes_usuario[i+1])
+                except DestinationError:
+                    print("Error calculo KM")
+                i += 1
+        usuario = get_usuario_por_numero(indice_usuarios)
+    return total_km
+    
 
-
-def total_km_todos(viajeros):
-    total = 0
-    for u, data in viajeros.items():
-        i = 0
-        while i < len(data["viaje"]):
-            a, b = data["viaje"][i]
-            try:
-                total += km_entre(a, b)
-            except DestinationError:
-                pass
-            i += 1
-    return total
-
-
-
-
-
-
-def top5_destinos(viajeros):
-    # contamos apariciones de cada destino como destino final de tramo
-    visitas = [0] * len(DESTINOS)
-    for _, data in viajeros.items():
-        i = 0
-        while i < len(data["viaje"]):
-            _, dest = data["viaje"][i]
-            idx = get_id_destino(dest)
-            if idx != -1:
-                visitas[idx] += 1
-            i += 1
-    # ordenamiento por seleccion sobre indices
-    indices = list(range(len(DESTINOS)))
-    a = 0
-    while a < len(indices) - 1:
-        pos_max = a
-        b = a + 1
-        while b < len(indices):
-            if visitas[indices[b]] > visitas[indices[pos_max]]:
-                pos_max = b
-            b += 1
-        indices[a], indices[pos_max] = indices[pos_max], indices[a]
-        a += 1
-    # top 5 con visitas > 0
-    res = []
-    k = 0
-    while k < 5 and k < len(indices):
-        if visitas[indices[k]] > 0:
-            res.append([DESTINOS[indices[k]], visitas[indices[k]]])
-        k += 1
-    return res
+def km_entre(origen, destino): #Validado
+    i, j = get_id_destino(origen), get_id_destino(destino)
+    if i == -1 or j == -1:
+        raise DestinationError("Destino desconocido para calcular KM.")
+    return _KM[i][j]
 
 
+def usuario_max_km(): #Validado
+    usuario_max_km = ""
+    indice_usuarios = 0
+    max_km = 0
+    usuario = get_usuario_por_numero(indice_usuarios)
+    while usuario != "-1":
+        indice_usuarios += 1
+        viajes_usuario = leer_datos(usuario)[1]
+        cant_destinos = len(viajes_usuario)
+        km_usuario = 0
+        if cant_destinos > 1:
+            i = 0
+            while i < cant_destinos - 1:
+                try:
+                    km_usuario += km_entre(viajes_usuario[i], viajes_usuario[i+1])
+                except DestinationError:
+                    print("Error calculo KM")
+                    km_usuario = 0
+                if km_usuario > max_km:
+                    max_km = km_usuario
+                    usuario_max_km = usuario
+                i += 1
+        usuario = get_usuario_por_numero(indice_usuarios)
+    return usuario_max_km, max_km
+    
 
-
-
-
-def usuario_max_km(viajeros):
-    mejor_user = ""
-    mejor_km = -1
-    for u, data in viajeros.items():
-        km_u = 0
-        i = 0
-        while i < len(data["viaje"]):
-            a, b = data["viaje"][i]
-            try:
-                km_u += km_entre(a, b)
-            except DestinationError:
-                pass
-            i += 1
-        if km_u > mejor_km:
-            mejor_km = km_u
-            mejor_user = u
-    return mejor_user, mejor_km
-
-def usuario_max_destinos(viajeros):
-    mejor_user = ""
-    mejor_cant = -1
-    for u, data in viajeros.items():
-        cant = len(data["viaje"])
-        if cant > mejor_cant:
-            mejor_cant = cant
-            mejor_user = u
-    return mejor_user, mejor_cant
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def usuario_max_destinos(): #Validado
+    usuario_max_dest = ""
+    i=0
+    max = 0
+    usuario = get_usuario_por_numero(i)
+    while usuario != "-1":
+        i += 1
+        datos = leer_datos(usuario)[1]
+        cant_destinos = len(datos)
+        if cant_destinos > max:
+            max = cant_destinos
+            usuario_max_dest = usuario
+        usuario = get_usuario_por_numero(i)
+    return usuario_max_dest, max
+    
 
 
 # ------------------------- Autenticación (diccionario) -------------------------
-def autenticar(usuario_ingresado, contrasena_ingresada):
+def autenticar(usuario_ingresado, contrasena_ingresada): #Validado
     '''usuario;contrasena;tipo (tipo = 1 si es normal | tipo = 2 si es admin | -1 si no encuentra al usuario)'''
     with open("usuarios.txt", mode="r", encoding="utf-8") as archivo_usuarios:
         linea_leida = archivo_usuarios.readline()
@@ -269,12 +240,7 @@ def autenticar(usuario_ingresado, contrasena_ingresada):
 
 
 
-
-
-
-
-
-def registrar_viaje(viajes_usuario):
+def registrar_viaje(viajes_usuario): 
 
     while True:
         consultar_viaje(viajes_usuario)
@@ -293,8 +259,6 @@ def registrar_viaje(viajes_usuario):
                     print("Destino igual al anterior, no se agrega.")
                 else:
                     viajes_usuario.append(nuevo_destino)
-
-
 
 
 
@@ -338,26 +302,26 @@ def menu_usuario(viajes_usuario, usuario):
                 consultar_viaje(viajes_usuario)
             elif opcion == 3:
                 try:
-                    kms_viaje(viajes_usuario, usuario)
+                    kms_viaje(viajes_usuario)
                 except (EmptyItineraryError, DestinationError) as e:
                     print(e)
             elif opcion == 4:
-                cant_escalas(viajes_usuario, usuario)
+                cant_escalas(viajes_usuario)
             elif opcion == 5:
                 try:
-                    cant_provincias(viajes_usuario, usuario)
+                    cant_provincias(viajes_usuario)
                 except DestinationError as mensaje_error:
                     print(mensaje_error)
             elif opcion == 6:
-                eliminar_viaje(viajes_usuario, usuario)
-                escribir_datos(viajes_usuario)
+                viajes_usuario = []
+                escribir_datos(usuario, viajes_usuario)
+                print("Viaje borrado")
             elif opcion == 7:
                 print("Cerrando sesion...")
             else:
                 raise MenuOptionError("Opcion invalida.")
         except MenuOptionError as mensaje_error:
             print(mensaje_error)
-
 
 
 
@@ -371,7 +335,7 @@ def menu_admin(usuario):
         print("4) Usuario con mas KM")
         print("5) Usuario con mas destinos")
         print("6) Menu de usuario (impersonar)")
-        print("7) Cambiar contrasena de usuario")
+        print("7) Cambiar contrasena o agregar usuario")
         print("8) Reporte consolidado (matriz de viajes)")
         print("9) Cerrar sesion")
         try:
@@ -385,11 +349,7 @@ def menu_admin(usuario):
                 if not top:
                     print("Sin datos suficientes.")
                 else:
-                    print("Top 5 destinos:")
-                    i = 0
-                    while i < len(top):
-                        print(f" {i+1}. {top[i][0]} - {top[i][1]} visitas")
-                        i += 1
+                    print("Top 5 destinos:", top)
             elif opcion == 4:
                 u, km = usuario_max_km()
                 print("Usuario con mas KM:", u, "-", km, "KM")
@@ -398,14 +358,15 @@ def menu_admin(usuario):
                 print("Usuario con mas destinos:", u, "-", cant, "destinos")
             elif opcion == 6:
                 print("Usuario a simular menu:")
-                usuario_a_impersonar = normalizar(input("> "))
+                usuario_a_impersonar = input("> ")
                 if (usuario_existe(usuario_a_impersonar)):
-                    menu_usuario(usuario_a_impersonar)
+                    menu_usuario(usuario_a_impersonar, leer_datos(usuario_a_impersonar))
                 else:
                     print("Usuario no encontrado.")
             elif opcion == 7:
                 try:
-                    cambiar_contrasena(usuario)
+                    print("Ingrese el nuevo usuario")
+                    cambiar_contrasena(normalizar(input("> ")))
                 except AuthError as mensaje_error:
                     print(mensaje_error)
             elif opcion == 8:
@@ -418,14 +379,13 @@ def menu_admin(usuario):
             print(mensaje_error)
 
 
-def escribir_log(cadena):
+def escribir_log(cadena): #Validado
     with open("logs.txt", mode="a", encoding="utf-8") as archivo_log:
         archivo_log.write(cadena +"\n")
 
 
 
-
-def usuario_existe(usuario_a_chequear):
+def usuario_existe(usuario_a_chequear): #Validado
     '''Devuelve True si existe de lo contrario False'''
     with open("usuarios.txt", mode="r", encoding="utf-8") as archivo_usuarios:
 
@@ -445,7 +405,7 @@ def usuario_existe(usuario_a_chequear):
 
 
 
-def leer_datos(usuario_a_leer, archivo=DATA_FILE):
+def leer_datos(usuario_a_leer, archivo=DATA_FILE): #Validado
     '''Busca al usuario y trae la info de viajes retorna -1 si hay un error, 0 si no lo encuentra y 1 si encuentra
     Estructura: Daniel;["CABA", "Rosario", "La Plata"] '''
     resultado = 1
@@ -482,12 +442,13 @@ def leer_datos(usuario_a_leer, archivo=DATA_FILE):
     return resultado, datos_final
 
 
-def escribir_datos(usuario_a_escribir, datos_a_escribir, nombre_archivo_principal=DATA_FILE, nombre_archivo_temporal=TEMP_DATA_FILE, escribir_viajes = True, tipo=1):
+def escribir_datos(usuario_a_escribir, datos_a_escribir, nombre_archivo_principal=DATA_FILE, nombre_archivo_temporal=TEMP_DATA_FILE, escribir_viajes = True, tipo=1): #Validado
     '''Escribe un archivo .txt temporal con los nuevos datos, si no encuentra al usuario lo agrega al final
     La estructura es usuario;[destino 1, destino2, destino3]   Retorna -1 si falla o 1 si escribe'''
 
     resultado = 1
     usuario_encontrado = False
+    sin_datos = True if datos_a_escribir == [] else False
     try:
         with open (nombre_archivo_principal, mode="r", encoding="utf-8") as archivo_principal, open (nombre_archivo_temporal, mode="w", encoding="utf-8") as archivo_temporal:
             cant_lineas = sum(1 for _ in archivo_principal)
@@ -495,7 +456,7 @@ def escribir_datos(usuario_a_escribir, datos_a_escribir, nombre_archivo_principa
             i = 0
             linea_leida = archivo_principal.readline()
             if linea_leida == "":
-                archivo_temporal.write(usuario_a_escribir + ";" + str(datos_a_escribir)) if escribir_viajes else archivo_temporal.write(usuario_a_escribir + ";" + datos_a_escribir + ";" + tipo)#Si el archivo está vacío
+                archivo_temporal.write(usuario_a_escribir + ";" + json.dumps(datos_a_escribir)) if escribir_viajes else archivo_temporal.write(usuario_a_escribir + ";" + datos_a_escribir + ";" + str(tipo))#Si el archivo está vacío
                 usuario_encontrado = True
             while linea_leida != "":
                 i+=1
@@ -510,13 +471,13 @@ def escribir_datos(usuario_a_escribir, datos_a_escribir, nombre_archivo_principa
                         archivo_temporal.write(linea_leida)
                     else: 
                         if cant_lineas != i:
-                            archivo_temporal.write(usuario_a_escribir + ";" + str(datos_a_escribir) + "\n") if escribir_viajes else archivo_temporal.write(usuario_a_escribir + ";" + datos_a_escribir + ";" + tipo + "\n")
+                            archivo_temporal.write(usuario_a_escribir + ";" + json.dumps(datos_a_escribir) + "\n") if escribir_viajes else archivo_temporal.write(usuario_a_escribir + ";" + datos_a_escribir + ";" + str(tipo) + "\n")
                         else:
-                            archivo_temporal.write(usuario_a_escribir + ";" + str(datos_a_escribir)) if escribir_viajes else archivo_temporal.write(usuario_a_escribir + ";" + datos_a_escribir + ";" + tipo)
+                            archivo_temporal.write(usuario_a_escribir + ";" + json.dumps(datos_a_escribir)) if escribir_viajes else archivo_temporal.write(usuario_a_escribir + ";" + datos_a_escribir + ";" + str(tipo))
                         usuario_encontrado = True
                 linea_leida = archivo_principal.readline()
             if usuario_encontrado == False and resultado == 1:
-                archivo_temporal.write("\n" + usuario_a_escribir + ";" + str(datos_a_escribir)) if escribir_viajes else archivo_temporal.write("\n" + usuario_a_escribir + ";" + str(datos_a_escribir) + ";" + tipo)
+                archivo_temporal.write("\n" + usuario_a_escribir + ";" + json.dumps(datos_a_escribir)) if escribir_viajes else archivo_temporal.write("\n" + usuario_a_escribir + ";" + str(datos_a_escribir) + ";" + str(tipo))
     except OSError:
         resultado = -1
         print("Error abriendo el archivo")
@@ -525,7 +486,7 @@ def escribir_datos(usuario_a_escribir, datos_a_escribir, nombre_archivo_principa
     return resultado
 
 
-def cantidad_usuarios():
+def cantidad_usuarios(): #Validado
     cant_lineas = 0
     with open("usuarios.txt", mode="r", encoding="utf-8") as archivo_usuarios:
         linea_leida = archivo_usuarios.readline()
@@ -534,7 +495,7 @@ def cantidad_usuarios():
             linea_leida = archivo_usuarios.readline()
     return cant_lineas
 
-def get_usuario_por_numero(numero):
+def get_usuario_por_numero(numero): #Validado
     '''La primera linea es la numero 0 devuelve el usuario en esa posición'''
     if numero < 0:
         return "-1"
@@ -554,9 +515,9 @@ def get_usuario_por_numero(numero):
 
 
 
-def reporte_consolidado():
+def reporte_consolidado(): #Verificado
     print("\n=== REPORTE CONSOLIDADO DE VIAJES (MATRIZ) ===")
-    print("Usuario |    Vuelos ")
+    print("Usuario  |   [ Vuelos ]")
     usuario = ""
     i=0
     usuario = get_usuario_por_numero(i)
@@ -566,7 +527,7 @@ def reporte_consolidado():
             usuario = get_usuario_por_numero(i)
 
 
-def cambiar_contrasena(usuario):
+def cambiar_contrasena(usuario): #Validado
     '''Cambia la contraseña y el tipo, si no encuentra el usuario lo agrega'''
 
     print("Cambio de contrasena, si no existe el usuario se agrega")
