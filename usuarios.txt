@@ -1,5 +1,0 @@
-Usuario0;1098;2
-Usuario1;1098;1
-Usuario2;lWLSHM;1
-Usuario3;1098;1
-Usuario4;1098;1
