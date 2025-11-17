@@ -19,7 +19,6 @@ while True:
             break
         print("Ingrese contraseña:")
         contrasena = input("> ").strip()
-
         user = autenticar(usuario, str(contrasena))
         if user == 1:
             viajes_usuario = leer_datos(usuario)[1]

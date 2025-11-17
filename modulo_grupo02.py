@@ -460,7 +460,7 @@ def leer_datos(usuario_a_leer, archivo=DATA_FILE):
                     resultado = -1
                     linea_leida= ""
                 else:
-                    if usuario_leido == usuario_a_leer:
+                    if usuario_leido.lower() == usuario_a_leer.lower():
                         try:
                             datos_final = json.loads(datos_leidos)
                         except ValueError:
