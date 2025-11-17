@@ -2,13 +2,14 @@
 Aterrizar Main.py
 """
 
-from modulo_grupo02 import (crear_usuarios, autenticar, menu_usuario, menu_admin, leer_datos)
+from modulo_grupo02 import (crear_usuarios, autenticar, menu_usuario, menu_admin, leer_datos, invertir_chars)
 
 # ------------------------- Cargar o inicializar datos -------------------------
 
 #crear_usuarios(5) #Formato Usuario: Usuario{i} contraseña: 1234
 
 # ------------------------- Inicio de sesion -------------------------
+
 while True:
         print (" ")
         print("\nIngrese su usuario (o 'salir' para terminar):")

@@ -8,3 +8,9 @@ Usuario3 creado
 
 Usuario4 creado 
 
+admin inició sesion como admin
+
+admin impersonó a user1 
+
+user1 inició sesion 
+
