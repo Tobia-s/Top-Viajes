@@ -29,21 +29,53 @@ def input_int(prompt):
             print("Debe ingresar un numero entero. Intente nuevamente.")
 
 # ------------------------- Datos base (destinos, provincias, matriz km) -------------------------
-DESTINOS = ["CABA", "La Plata", "Mar del Plata", "Rosario", "Cordoba", "Mendoza", "Salta", "Bariloche"]
-PROVINCIAS = ["CABA", "Buenos Aires", "Buenos Aires", "Santa Fe", "Cordoba", "Mendoza", "Salta", "Rio Negro"]
+#destinos = ["CABA", "La Plata", "Mar del Plata", "Rosario", "Cordoba", "Mendoza", "Salta", "Bariloche"]
+#provincias = ["CABA", "Buenos Aires", "Buenos Aires", "Santa Fe", "Cordoba", "Mendoza", "Salta", "Rio Negro"]
+
+provincias = []
+
+destinos = []
+
 
 # Matriz de distancias (km) - simetrica, 0 en diagonal
-_KM = [
-    [0,   56,  415, 300, 700, 1050, 1540, 1620],
-    [56,   0,  355, 330, 690, 1100, 1590, 1700],
-    [415,355,    0, 620, 950, 1350, 1850, 1600],
-    [300,330,  620,   0, 400, 1050, 1320, 1500],
-    [700,690,  950, 400,   0,  620,  980, 1450],
-    [1050,1100,1350,1050,620,   0,  1200, 800],
-    [1540,1590,1850,1320,980, 1200,   0, 2100],
-    [1620,1700,1600,1500,1450, 800, 2100,   0],
-]
+#distancias = [
+#    [0,   56,  415, 300, 700, 1050, 1540, 1620],
+#    [56,   0,  355, 330, 690, 1100, 1590, 1700],
+#    [415,355,    0, 620, 950, 1350, 1850, 1600],
+#    [300,330,  620,   0, 400, 1050, 1320, 1500],
+#    [700,690,  950, 400,   0,  620,  980, 1450],
+#    [1050,1100,1350,1050,620,   0,  1200, 800],
+#    [1540,1590,1850,1320,980, 1200,   0, 2100],
+#    [1620,1700,1600,1500,1450, 800, 2100,   0],
+#]
 
+distancias = []
+def leer_destinos():
+    with open("destinos.txt", "r") as destinosFile:
+        global destinos 
+        destinos = destinosFile.read().split(',')
+        return destinos
+    
+def leer_provincias():
+    with open("provincias.txt", "r") as provinciasFile:
+        global provincias 
+        provincias = provinciasFile.read().split(',')
+        return provincias
+    
+def leer_distancias():
+    with open("distancias.txt", "r") as dist:
+        global distancias
+        for line in dist:
+            if (line != None):
+                
+                temp = line.strip('[').strip(']').strip('\n').split(',')
+
+                lineaProcesada = list(map(int, temp))
+
+                distancias.append(lineaProcesada)
+
+    
+            
 
 
 # ------------------------- Persistencia (JSON) -------------------------
