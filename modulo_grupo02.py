@@ -100,10 +100,10 @@ def top5_destinos():
     #visitas tiene la cantidad de veces que se visitó el destino (el indice coincide con la lista DESTINOS)
     lista_top5_destinos = []
     for _ in range(5):
-        max = 0
+        maximo = 0
         for indice in range(len(visitas)): #itera por todos los destinos (visitas) y guarda el indice mas grande
-            if visitas[indice] > max:
-                max = visitas[indice]
+            if visitas[indice] > maximo:
+                maximo = visitas[indice]
                 indice_maximo = indice
         lista_top5_destinos.append(DESTINOS[indice_maximo])
         visitas[indice_maximo] = -1 #anulo el indice para que no se repita
@@ -320,7 +320,7 @@ def menu_usuario(viajes_usuario, usuario):
                 escribir_log(f"{usuario} consultó sus viajes \n")
             elif opcion == 3:
                 try:
-                    kms_viaje(viajes_usuario)
+                    print(kms_viaje(viajes_usuario))
                 except (EmptyItineraryError, DestinationError) as e:
                     print(e)
                     escribir_log(f"{usuario} error al calcular kilometros \n")

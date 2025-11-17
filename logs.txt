@@ -56,3 +56,59 @@ admin inició sesion como admin
 
 admin consultó el reporte consolidado 
 
+user1 inició sesion 
+
+user1 consultó sus viajes 
+
+user1 cerró sesion 
+
+admin inició sesion como admin
+
+admin consultó el reporte consolidado 
+
+admin consultó la cantidad de kilometros totales
+
+user1 inició sesion 
+
+user1 editó sus viajes 
+
+user1 consultó sus viajes 
+
+user1 inició sesion 
+
+user1 consultó sus viajes 
+
+user1 inició sesion 
+
+user1 consultó sus viajes 
+
+user1 inició sesion 
+
+user1 inició sesion 
+
+user1 cerró sesion 
+
+admin inició sesion como admin
+
+admin consultó la cantidad de usuarios
+
+admin consultó la cantidad de kilometros totales
+
+admin consultó los top 5 destinos
+
+admin consultó cual es el usuario con mas kilometros 
+
+admin consultó cual es el usuario con mas kilometros 
+
+admin inició un cambio de contraseña 
+
+user1 inició sesion 
+
+user1 editó sus viajes 
+
+user1 cerró sesion 
+
+user3 inició sesion 
+
+user3 consultó sus viajes 
+
